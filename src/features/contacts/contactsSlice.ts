@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { UserType } from '../../types/User';
 import type { RootState } from '../../app/store';
 
@@ -17,7 +17,21 @@ const initialState: InitialStateType = {
 const contactsSlice = createSlice({
   name: 'contacts',
   initialState: initialState,
-  reducers: {},
+  reducers: {
+    addContact: (state, action: PayloadAction<UserType>) => {
+      return {
+        ...state,
+        items: [...state.items, action.payload]
+      };
+    },
+
+    removeContact: (state, action: PayloadAction<UserType['id']>) => {
+      return {
+        ...state,
+        items: state.items.filter((item) => item.id !== action.payload)
+      };
+    }
+  },
 
   extraReducers: (builder) => {
     (builder.addCase(fetchContacts.pending, (state) => {
@@ -49,8 +63,10 @@ export const fetchContacts = createAsyncThunk('contacts/fetchContacts', async ()
   }
 });
 
-export const {} = contactsSlice.actions;
+export const { addContact, removeContact } = contactsSlice.actions;
 
 export const selectContacts = (state: RootState) => state.contacts.items;
+export const selectContactsStatus = (state: RootState) => state.contacts.isLoading;
+export const selectContactsError = (state: RootState) => state.contacts.error;
 
 export default contactsSlice.reducer;
