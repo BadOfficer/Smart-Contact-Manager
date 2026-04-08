@@ -34,33 +34,31 @@ const contactsSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    (builder.addCase(fetchContacts.pending, (state) => {
+    builder.addCase(fetchContacts.pending, (state) => {
       state.isLoading = true;
       state.error = null;
-    }),
-      builder.addCase(fetchContacts.fulfilled, (state, action) => {
-        state.items = action.payload;
-        state.isLoading = false;
-      }),
-      builder.addCase(fetchContacts.rejected, (state, action) => {
-        state.error = action.error?.message || 'Unknown error';
-        state.isLoading = false;
-      }));
+    });
+
+    builder.addCase(fetchContacts.fulfilled, (state, action) => {
+      state.items = action.payload;
+      state.isLoading = false;
+    });
+
+    builder.addCase(fetchContacts.rejected, (state, action) => {
+      state.error = action.error?.message || 'Unknown error';
+      state.isLoading = false;
+    });
   }
 });
 
 export const fetchContacts = createAsyncThunk('contacts/fetchContacts', async () => {
-  try {
-    const response = await fetch('https://jsonplaceholder.typicode.com/users');
+  const response = await fetch('https://jsonplaceholder.typicode.com/users');
 
-    if (!response.ok) {
-      throw new Error('Users fetching failed');
-    }
-
-    return response.json();
-  } catch (e) {
-    console.error(e);
+  if (!response.ok) {
+    throw new Error('Users fetching failed');
   }
+
+  return response.json();
 });
 
 export const { addContact, removeContact } = contactsSlice.actions;

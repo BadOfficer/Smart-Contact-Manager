@@ -8,8 +8,9 @@ import {
 } from './features/contacts/contactsSlice';
 import { useAppDispatch, useAppSelector } from './app/store';
 import { ContactsList } from './components/ContactsList';
-import { Alert, Box, CircularProgress, Container, Typography } from '@mui/material';
+import { Box, CircularProgress, Container, Typography } from '@mui/material';
 import type { UserType } from './types/User';
+import { ErrorMessage } from './components/ErrorMessage';
 
 function App() {
   const contacts = useAppSelector(selectContacts);
@@ -24,6 +25,10 @@ function App() {
 
   const handleRemoveContact = (id: UserType['id']) => {
     dispatch(removeContact(id));
+  };
+
+  const handleFetchContacts = () => {
+    dispatch(fetchContacts());
   };
 
   return (
@@ -43,7 +48,7 @@ function App() {
 
       {contactsLoadingStatus && <CircularProgress />}
 
-      {contactsError && <Alert severity="error">{contactsError}</Alert>}
+      {contactsError && <ErrorMessage onRetry={handleFetchContacts}>{contactsError}</ErrorMessage>}
 
       <Box sx={{ width: '100%' }}>
         {!contactsLoadingStatus && !contactsError && (
