@@ -1,16 +1,17 @@
 import { useEffect } from 'react';
 import {
-  fetchContacts,
+  fetchWithNotification,
   removeContact,
   selectContacts,
   selectContactsError,
   selectContactsStatus
 } from './features/contacts/contactsSlice';
 import { useAppDispatch, useAppSelector } from './app/store';
-import { ContactsList } from './components/ContactsList';
+import { ContactsList } from './features/contacts/components/ContactsList';
 import { Box, CircularProgress, Container, Typography } from '@mui/material';
 import type { UserType } from './types/User';
 import { ErrorMessage } from './components/ErrorMessage';
+import { NotificationContainer } from './features/notifications/components/NotificationContainer';
 
 function App() {
   const contacts = useAppSelector(selectContacts);
@@ -20,7 +21,7 @@ function App() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchContacts());
+    dispatch(fetchWithNotification());
   }, []);
 
   const handleRemoveContact = (id: UserType['id']) => {
@@ -28,7 +29,7 @@ function App() {
   };
 
   const handleFetchContacts = () => {
-    dispatch(fetchContacts());
+    dispatch(fetchWithNotification());
   };
 
   return (
@@ -42,6 +43,7 @@ function App() {
         gap: '32px'
       }}
     >
+      <NotificationContainer />
       <Typography variant="h3" component="h1" sx={{ alignSelf: 'flex-start' }}>
         Smart Contacts Manager
       </Typography>

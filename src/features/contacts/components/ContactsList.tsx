@@ -1,5 +1,5 @@
 import { Alert, IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import type { UserType } from '../types/User';
+import type { UserType } from '../../../types/User';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import { blue } from '@mui/material/colors';

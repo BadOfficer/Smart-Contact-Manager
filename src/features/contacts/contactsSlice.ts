@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { UserType } from '../../types/User';
-import type { RootState } from '../../app/store';
+import type { AppDispatch, RootState } from '../../app/store';
+import { addNotification } from '../notifications/notificationsSlice';
 
 interface InitialStateType {
   items: UserType[];
@@ -12,6 +13,40 @@ const initialState: InitialStateType = {
   items: [],
   isLoading: false,
   error: null
+};
+
+export const fetchContacts = createAsyncThunk('contacts/fetchContacts', async () => {
+  const response = await fetch('https://jsonplaceholder.typicode.com/users');
+
+  if (!response.ok) {
+    throw new Error('Users fetching failed');
+  }
+
+  return response.json();
+});
+
+export const fetchWithNotification = () => async (dispatch: AppDispatch) => {
+  try {
+    await dispatch(fetchContacts()).unwrap();
+
+    dispatch(
+      addNotification({
+        id: Date.now(),
+        title: 'Success',
+        message: 'Fetching success',
+        type: 'success'
+      })
+    );
+  } catch (e: any) {
+    dispatch(
+      addNotification({
+        id: Date.now(),
+        title: 'Something went wrong',
+        message: e?.message || 'Fething failed',
+        type: 'error'
+      })
+    );
+  }
 };
 
 const contactsSlice = createSlice({
@@ -49,16 +84,6 @@ const contactsSlice = createSlice({
       state.isLoading = false;
     });
   }
-});
-
-export const fetchContacts = createAsyncThunk('contacts/fetchContacts', async () => {
-  const response = await fetch('https://jsonplaceholder.typicode.com/users');
-
-  if (!response.ok) {
-    throw new Error('Users fetching failed');
-  }
-
-  return response.json();
 });
 
 export const { addContact, removeContact } = contactsSlice.actions;

@@ -1,11 +1,46 @@
-import { configureStore } from '@reduxjs/toolkit';
-import contactsReducer from '../features/contacts/contactsSlice';
+import { configureStore, createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
+import contactsReducer, { addContact, removeContact } from '../features/contacts/contactsSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import notificationsReducer, {
+  addNotification
+} from '../features/notifications/notificationsSlice';
+
+export const listenerMiddleware = createListenerMiddleware();
+
+listenerMiddleware.startListening({
+  matcher: isAnyOf(addContact, removeContact),
+  effect: (action, listenerApi) => {
+    let message;
+
+    switch (action.type) {
+      case 'contacts/addContact':
+        message = 'Contact added succesfully';
+        break;
+      case 'contacts/removeContact':
+        message = 'Contact removed succesfully';
+        break;
+      default:
+        message = 'Action succesfull';
+    }
+
+    listenerApi.dispatch(
+      addNotification({
+        id: Date.now(),
+        message,
+        title: 'Success',
+        type: 'success'
+      })
+    );
+  }
+});
 
 export const store = configureStore({
   reducer: {
-    contacts: contactsReducer
-  }
+    contacts: contactsReducer,
+    notifications: notificationsReducer
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().prepend(listenerMiddleware.middleware)
 });
 
 export type RootState = ReturnType<typeof store.getState>;
