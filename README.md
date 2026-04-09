@@ -2,7 +2,7 @@
 
 A modern, responsive Single Page Application (SPA) designed to manage contacts. This project demonstrates advanced state management patterns using Redux Toolkit, handling asynchronous API operations, and building complex forms with validation.
 
-[Live Demo](https://github.com/BadOfficer/Smart-Contact-Manager)
+[Live Demo](https://badofficer.github.io/Smart-Contact-Manager/)
 
 - **Asynchronous Data Fetching:** Utilizes `createAsyncThunk` to fetch initial user data from a REST API (`JSONPlaceholder`), complete with loading and error state handling.
 - **Complex State Management:** Separated Redux slices for business logic (`contactsSlice`) and UI state (`notificationsSlice`).
