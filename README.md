@@ -1,73 +1,53 @@
-# React + TypeScript + Vite
+# Smart Contact Manager 📇
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive Single Page Application (SPA) designed to manage contacts. This project demonstrates advanced state management patterns using Redux Toolkit, handling asynchronous API operations, and building complex forms with validation.
 
-Currently, two official plugins are available:
+[Live Demo](https://github.com/BadOfficer/Smart-Contact-Manager)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Asynchronous Data Fetching:** Utilizes `createAsyncThunk` to fetch initial user data from a REST API (`JSONPlaceholder`), complete with loading and error state handling.
+- **Complex State Management:** Separated Redux slices for business logic (`contactsSlice`) and UI state (`notificationsSlice`).
+- **Global Notification System:** A centralized Toast/Snackbar notification system that reacts to store changes (success, error, info).
+- **Form Validation:** Integrated `React Hook Form` with `Yup` resolvers for performant, re-render-free input handling and strict validation rules.
+- **Data Mutation:** Features to add new contacts, delete existing ones, and toggle "Favorite" status.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Core:** React, Vite
+- **State Management:** Redux Toolkit (`@reduxjs/toolkit`, `react-redux`)
+- **UI Library:** Material UI (MUI)
+- **Forms & Validation:** React Hook Form, Yup
+- **API Interactions:** Native Fetch API
 
-## Expanding the ESLint configuration
+## 📂 Architectural Highlights
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+This project was built with scalability in mind. It showcases the ability to avoid "Prop Drilling" and keeps React components pure by delegating heavy business logic, side effects, and API calls entirely to Redux Thunks.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 💻 Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+To run this project locally:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1.  **Clone the repository:**
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+    ```bash
+    git clone https://github.com/BadOfficer/Smart-Contact-Manager.git
+    cd Smart-Contact-Manager
+    ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+2.  **Install dependencies:**
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+    ```bash
+    npm install
+    ```
+
+3.  **Start the development server:**
+    ```bash
+    npm run dev
+    ```
+
+## 👨‍💻 Author
+
+**Taras Bondarenko**
+
+---
+
+_This project was built as a demonstration of modern Front-End architecture and Redux best practices._
