@@ -9,6 +9,7 @@ interface Props {
   onClose: () => void;
   contact: UserType | null;
   onSubmit: (contact: UserType) => void;
+  onCancel: () => void;
 }
 
 const styles: SxProps = {
@@ -23,10 +24,11 @@ const styles: SxProps = {
   p: 4
 };
 
-export const ContactForm = ({ isOpen, onClose, contact, onSubmit }: Props) => {
+export const ContactForm = ({ isOpen, onClose, contact, onSubmit, onCancel }: Props) => {
   const {
     handleSubmit,
     control,
+    reset,
     formState: { errors }
   } = useForm({
     resolver: yupResolver(contactSchema),
@@ -48,8 +50,14 @@ export const ContactForm = ({ isOpen, onClose, contact, onSubmit }: Props) => {
     onClose();
   };
 
+  const cancel = () => {
+    reset();
+    onCancel();
+    onClose();
+  };
+
   return (
-    <Modal open={isOpen} onClose={onClose}>
+    <Modal open={isOpen} onClose={cancel}>
       <Box sx={styles}>
         <Typography component="h2" variant="h4">
           Contact form
@@ -116,7 +124,7 @@ export const ContactForm = ({ isOpen, onClose, contact, onSubmit }: Props) => {
             <Button type="submit" variant="contained">
               Save
             </Button>
-            <Button type="reset" onClick={onClose} variant="outlined">
+            <Button type="reset" onClick={cancel} variant="outlined">
               Cancel
             </Button>
           </Box>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { NotificationType } from '../../../types/Notification';
 import { Alert, AlertTitle, Slide } from '@mui/material';
 
@@ -10,7 +10,6 @@ interface Props {
 
 export const Notification = React.memo(({ notification, onRemove, delay = 2000 }: Props) => {
   const [open, setOpen] = useState(true);
-  const removedRef = useRef(false);
 
   useEffect(() => {
     const timerId = setTimeout(() => setOpen(false), delay);
@@ -21,8 +20,6 @@ export const Notification = React.memo(({ notification, onRemove, delay = 2000 }
   const handleClose = () => setOpen(false);
 
   const handleExited = () => {
-    if (removedRef.current) return;
-    removedRef.current = true;
     onRemove(notification.id);
   };
 

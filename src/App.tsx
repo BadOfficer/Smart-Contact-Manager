@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   addContact,
   editContact,
@@ -7,11 +7,12 @@ import {
   selectContactsError,
   selectContactsStatus,
   selectEditingUser,
+  selectFollows,
   setEditingUser
 } from './features/contacts/contactsSlice';
 import { useAppDispatch, useAppSelector } from './app/store';
 import { ContactsList } from './features/contacts/components/ContactsList';
-import { Box, CircularProgress, Container, Fab, Typography } from '@mui/material';
+import { Box, CircularProgress, Container, Fab } from '@mui/material';
 import type { UserType } from './types/User';
 import { ErrorMessage } from './components/ErrorMessage';
 import { NotificationContainer } from './features/notifications/components/NotificationContainer';
@@ -19,20 +20,28 @@ import { NotificationContainer } from './features/notifications/components/Notif
 import AddIcon from '@mui/icons-material/Add';
 import { useModal } from './hooks/useModal';
 import { ContactForm } from './features/contacts/components/ContactForm';
+import { Header } from './components/Header';
+import { prepareContactsHelper } from './helpers/prepareContactsHelper';
 
 function App() {
   const contacts = useAppSelector(selectContacts);
   const contactsLoadingStatus = useAppSelector(selectContactsStatus);
   const contactsError = useAppSelector(selectContactsError);
   const editingContact = useAppSelector(selectEditingUser);
+  const follows = useAppSelector(selectFollows);
 
   const { isOpen, open, close } = useModal();
+  const [query, setQuery] = useState('');
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(fetchWithNotification());
   }, []);
+
+  const preparedContacts = useMemo(() => {
+    return prepareContactsHelper(contacts, { query });
+  }, [contacts, query]);
 
   const handleFetchContacts = () => {
     dispatch(fetchWithNotification());
@@ -50,8 +59,6 @@ function App() {
     if (editingContact) {
       return dispatch(setEditingUser(null));
     }
-
-    close();
   };
 
   return (
@@ -66,16 +73,16 @@ function App() {
       }}
     >
       <NotificationContainer />
-      <Typography variant="h3" component="h1" sx={{ alignSelf: 'flex-start' }}>
-        Smart Contacts Manager
-      </Typography>
+      <Header query={query} setQuery={setQuery} disabled={contacts.length === 0} />
 
       {contactsLoadingStatus && <CircularProgress />}
 
       {contactsError && <ErrorMessage onRetry={handleFetchContacts}>{contactsError}</ErrorMessage>}
 
       <Box sx={{ width: '100%' }}>
-        {!contactsLoadingStatus && !contactsError && <ContactsList contacts={contacts} />}
+        {!contactsLoadingStatus && !contactsError && (
+          <ContactsList contacts={preparedContacts} follows={follows} />
+        )}
       </Box>
 
       <Fab
@@ -95,9 +102,10 @@ function App() {
       {(isOpen || editingContact) && (
         <ContactForm
           isOpen={isOpen || Boolean(editingContact)}
-          onClose={onCancelContractForm}
+          onClose={close}
           onSubmit={(data: UserType) => onSubmitContactForm(data)}
           contact={editingContact}
+          onCancel={onCancelContractForm}
         />
       )}
     </Container>

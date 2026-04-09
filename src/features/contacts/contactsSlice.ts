@@ -8,13 +8,15 @@ interface InitialStateType {
   isLoading: boolean;
   error: null | string;
   editingUser: UserType | null;
+  followedContacts: UserType['id'][];
 }
 
 const initialState: InitialStateType = {
   items: [],
   isLoading: false,
   error: null,
-  editingUser: null
+  editingUser: null,
+  followedContacts: []
 };
 
 export const fetchContacts = createAsyncThunk<UserType[]>('contacts/fetchContacts', async () => {
@@ -67,7 +69,8 @@ const contactsSlice = createSlice({
     removeContact: (state, action: PayloadAction<UserType['id']>) => {
       return {
         ...state,
-        items: state.items.filter((item) => item.id !== action.payload)
+        items: state.items.filter((item) => item.id !== action.payload),
+        followedContacts: state.followedContacts.filter((id) => id !== action.payload)
       };
     },
 
@@ -94,6 +97,20 @@ const contactsSlice = createSlice({
         ...state,
         editingUser: action.payload
       };
+    },
+
+    toggleFollow: (state, action: PayloadAction<UserType['id']>) => {
+      if (state.followedContacts.includes(action.payload)) {
+        return {
+          ...state,
+          followedContacts: state.followedContacts.filter((ctId) => ctId !== action.payload)
+        };
+      }
+
+      return {
+        ...state,
+        followedContacts: [...state.followedContacts, action.payload]
+      };
     }
   },
 
@@ -115,11 +132,13 @@ const contactsSlice = createSlice({
   }
 });
 
-export const { addContact, removeContact, editContact, setEditingUser } = contactsSlice.actions;
+export const { addContact, removeContact, editContact, setEditingUser, toggleFollow } =
+  contactsSlice.actions;
 
 export const selectContacts = (state: RootState) => state.contacts.items;
 export const selectContactsStatus = (state: RootState) => state.contacts.isLoading;
 export const selectContactsError = (state: RootState) => state.contacts.error;
 export const selectEditingUser = (state: RootState) => state.contacts.editingUser;
+export const selectFollows = (state: RootState) => state.contacts.followedContacts;
 
 export default contactsSlice.reducer;
