@@ -1,22 +1,32 @@
 import { useEffect } from 'react';
 import {
+  addContact,
+  editContact,
   fetchWithNotification,
-  removeContact,
   selectContacts,
   selectContactsError,
-  selectContactsStatus
+  selectContactsStatus,
+  selectEditingUser,
+  setEditingUser
 } from './features/contacts/contactsSlice';
 import { useAppDispatch, useAppSelector } from './app/store';
 import { ContactsList } from './features/contacts/components/ContactsList';
-import { Box, CircularProgress, Container, Typography } from '@mui/material';
+import { Box, CircularProgress, Container, Fab, Typography } from '@mui/material';
 import type { UserType } from './types/User';
 import { ErrorMessage } from './components/ErrorMessage';
 import { NotificationContainer } from './features/notifications/components/NotificationContainer';
+
+import AddIcon from '@mui/icons-material/Add';
+import { useModal } from './hooks/useModal';
+import { ContactForm } from './features/contacts/components/ContactForm';
 
 function App() {
   const contacts = useAppSelector(selectContacts);
   const contactsLoadingStatus = useAppSelector(selectContactsStatus);
   const contactsError = useAppSelector(selectContactsError);
+  const editingContact = useAppSelector(selectEditingUser);
+
+  const { isOpen, open, close } = useModal();
 
   const dispatch = useAppDispatch();
 
@@ -24,12 +34,24 @@ function App() {
     dispatch(fetchWithNotification());
   }, []);
 
-  const handleRemoveContact = (id: UserType['id']) => {
-    dispatch(removeContact(id));
-  };
-
   const handleFetchContacts = () => {
     dispatch(fetchWithNotification());
+  };
+
+  const onSubmitContactForm = (user: UserType) => {
+    if (editingContact) {
+      return dispatch(editContact(user));
+    }
+
+    return dispatch(addContact(user));
+  };
+
+  const onCancelContractForm = () => {
+    if (editingContact) {
+      return dispatch(setEditingUser(null));
+    }
+
+    close();
   };
 
   return (
@@ -53,10 +75,31 @@ function App() {
       {contactsError && <ErrorMessage onRetry={handleFetchContacts}>{contactsError}</ErrorMessage>}
 
       <Box sx={{ width: '100%' }}>
-        {!contactsLoadingStatus && !contactsError && (
-          <ContactsList contacts={contacts} onRemoveCell={handleRemoveContact} />
-        )}
+        {!contactsLoadingStatus && !contactsError && <ContactsList contacts={contacts} />}
       </Box>
+
+      <Fab
+        component="button"
+        sx={{
+          position: 'absolute',
+          bottom: '15px',
+          right: '15px',
+          borderRadius: '50%'
+        }}
+        color="primary"
+        onClick={open}
+      >
+        <AddIcon />
+      </Fab>
+
+      {(isOpen || editingContact) && (
+        <ContactForm
+          isOpen={isOpen || Boolean(editingContact)}
+          onClose={onCancelContractForm}
+          onSubmit={(data: UserType) => onSubmitContactForm(data)}
+          contact={editingContact}
+        />
+      )}
     </Container>
   );
 }

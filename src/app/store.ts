@@ -1,5 +1,9 @@
 import { configureStore, createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
-import contactsReducer, { addContact, removeContact } from '../features/contacts/contactsSlice';
+import contactsReducer, {
+  addContact,
+  editContact,
+  removeContact
+} from '../features/contacts/contactsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import notificationsReducer, {
   addNotification
@@ -8,7 +12,7 @@ import notificationsReducer, {
 export const listenerMiddleware = createListenerMiddleware();
 
 listenerMiddleware.startListening({
-  matcher: isAnyOf(addContact, removeContact),
+  matcher: isAnyOf(addContact, removeContact, editContact),
   effect: (action, listenerApi) => {
     let message;
 
@@ -18,6 +22,9 @@ listenerMiddleware.startListening({
         break;
       case 'contacts/removeContact':
         message = 'Contact removed succesfully';
+        break;
+      case 'contacts/editContact':
+        message = 'Contact updated succesfully';
         break;
       default:
         message = 'Action succesfull';

@@ -3,13 +3,25 @@ import type { UserType } from '../../../types/User';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import { blue } from '@mui/material/colors';
+import EditIcon from '@mui/icons-material/Edit';
+import { useAppDispatch } from '../../../app/store';
+import { removeContact, setEditingUser } from '../contactsSlice';
 
 interface Props {
   contacts: UserType[];
-  onRemoveCell: (id: UserType['id']) => void;
 }
 
-export const ContactsList = ({ contacts, onRemoveCell }: Props) => {
+export const ContactsList = ({ contacts }: Props) => {
+  const dispatch = useAppDispatch();
+
+  const handleRemoveContact = (id: UserType['id']) => {
+    dispatch(removeContact(id));
+  };
+
+  const handleEditContact = (contact: UserType) => {
+    dispatch(setEditingUser(contact));
+  };
+
   if (contacts.length === 0) {
     return <Alert severity="info">Contacts is empty</Alert>;
   }
@@ -40,8 +52,11 @@ export const ContactsList = ({ contacts, onRemoveCell }: Props) => {
             <TableCell>{ct.username}</TableCell>
             <TableCell>{ct.email}</TableCell>
             <TableCell sx={{ textAlign: 'center' }}>
-              <IconButton onClick={() => onRemoveCell(ct.id)}>
+              <IconButton onClick={() => handleRemoveContact(ct.id)}>
                 <DeleteIcon />
+              </IconButton>
+              <IconButton onClick={() => handleEditContact(ct)}>
+                <EditIcon />
               </IconButton>
             </TableCell>
           </TableRow>

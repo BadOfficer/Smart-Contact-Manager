@@ -7,15 +7,17 @@ interface InitialStateType {
   items: UserType[];
   isLoading: boolean;
   error: null | string;
+  editingUser: UserType | null;
 }
 
 const initialState: InitialStateType = {
   items: [],
   isLoading: false,
-  error: null
+  error: null,
+  editingUser: null
 };
 
-export const fetchContacts = createAsyncThunk('contacts/fetchContacts', async () => {
+export const fetchContacts = createAsyncThunk<UserType[]>('contacts/fetchContacts', async () => {
   const response = await fetch('https://jsonplaceholder.typicode.com/users');
 
   if (!response.ok) {
@@ -42,7 +44,7 @@ export const fetchWithNotification = () => async (dispatch: AppDispatch) => {
       addNotification({
         id: Date.now(),
         title: 'Something went wrong',
-        message: e?.message || 'Fething failed',
+        message: e?.message || 'Fetching failed',
         type: 'error'
       })
     );
@@ -54,9 +56,11 @@ const contactsSlice = createSlice({
   initialState: initialState,
   reducers: {
     addContact: (state, action: PayloadAction<UserType>) => {
+      const lastId = state.items.at(-1)?.id;
+
       return {
         ...state,
-        items: [...state.items, action.payload]
+        items: [...state.items, { ...action.payload, id: (lastId ?? 0) + 1 }]
       };
     },
 
@@ -64,6 +68,31 @@ const contactsSlice = createSlice({
       return {
         ...state,
         items: state.items.filter((item) => item.id !== action.payload)
+      };
+    },
+
+    editContact: (state, action: PayloadAction<UserType>) => {
+      return {
+        ...state,
+        items: state.items.map((ct) => {
+          if (ct.id === action.payload.id) {
+            return {
+              ...action.payload,
+              id: ct.id
+            };
+          }
+
+          return ct;
+        }),
+
+        editingUser: null
+      };
+    },
+
+    setEditingUser: (state, action: PayloadAction<UserType | null>) => {
+      return {
+        ...state,
+        editingUser: action.payload
       };
     }
   },
@@ -86,10 +115,11 @@ const contactsSlice = createSlice({
   }
 });
 
-export const { addContact, removeContact } = contactsSlice.actions;
+export const { addContact, removeContact, editContact, setEditingUser } = contactsSlice.actions;
 
 export const selectContacts = (state: RootState) => state.contacts.items;
 export const selectContactsStatus = (state: RootState) => state.contacts.isLoading;
 export const selectContactsError = (state: RootState) => state.contacts.error;
+export const selectEditingUser = (state: RootState) => state.contacts.editingUser;
 
 export default contactsSlice.reducer;
